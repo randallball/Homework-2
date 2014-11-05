@@ -392,6 +392,34 @@ big_number operator+(const big_number& a, const big_number& b)
 big_number operator-(const big_number& a, const big_number& b)
 {
 	big_number answer;
+	big_number z(b);
+
+	if (a.positive == b.positive)
+	{
+		if (a.positive)
+		{
+			z.positive = false;
+			answer = a + z;
+		}
+		else
+		{
+			z.positive = true;
+			answer = a + z;
+		}
+	}
+	else
+	{
+		if (a.positive)
+		{
+			z.positive = true;
+			answer = a + z;
+		}
+		else
+		{
+			z.positive = false;
+			answer = a + z;
+		}
+	}
 	return answer;
 }
 
