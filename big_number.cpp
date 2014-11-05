@@ -127,20 +127,8 @@ big_number& big_number::operator=(const big_number& m)
 // set value to original value + b; return answer in original number's base
 big_number& big_number::operator+= (const big_number& b)
 {
-    if (positive == b.positive)
-    {
-        if (*this >= b)
-        this->sum(b);
-    }
-    else if ((!positive && !b.positive))
-    {
-        if (*this < b)
-        {
-            const big_number c(b);
-            *this = c;
-        }
-    }
-return *this;
+    *this = *this + b;
+	return *this;
 }
 
 
@@ -181,6 +169,7 @@ big_number& big_number::operator*= (const big_number& b)
 // set value to original value - b; return answer in original number's base
 big_number& big_number::operator-= (const big_number& b)
 {
+	*this = *this - b;
 	return *this;
 }
 

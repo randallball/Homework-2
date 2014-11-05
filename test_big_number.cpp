@@ -18,6 +18,8 @@ int main()
 		cout << "Type 'a' to test assignment" << endl;
 		cout << "Type '+' to test addition" << endl;
 		cout << "Type '-' to test subtraction" << endl;
+		cout << "Type '1' to test self assigning addition" << endl;
+		cout << "Type '2' to test self assigning subtraction" << endl;
 		cout << "Type '*' to test self assigning multiplication" << endl;
 		cout << "Type '>' to test input operator" << endl;
 		cout << "Type '=' to test comparison operators" << endl;
@@ -92,6 +94,32 @@ int main()
 			big_number b(n2);
 			cout << a << " - " << b;
 			a = a - b;
+			cout << " = " << a << endl;
+		}
+
+		if (choice == '1')
+		{
+			cout << "Enter a number: ";
+			cin >> n1;
+			big_number a(n1);
+			cout << "Enter another number: ";
+			cin >> n2;
+			big_number b(n2);
+			cout << a << " + " << b;
+			a += b;
+			cout << " = " << a << endl;
+		}
+
+		if (choice == '2')
+		{
+			cout << "Enter a number: ";
+			cin >> n1;
+			big_number a(n1);
+			cout << "Enter another number: ";
+			cin >> n2;
+			big_number b(n2);
+			cout << a << " - " << b;
+			a -= b;
 			cout << " = " << a << endl;
 		}
 
