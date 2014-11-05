@@ -86,9 +86,13 @@ big_number::big_number(const string& s, unsigned int b)
 	{
 		positive = true;
 	}
-	while (str[0] == '0' && s.length() > 1)//Remove leading 0's
+	while (str[0] == '0' && str.length() > 1)//Remove leading 0's
 	{
 		str.erase(0,1);
+	}
+	if (str == "0")//If the number is 0, set to positive.
+	{
+		positive = true;
 	}
 	digits = str.length();
 	base = b;
@@ -318,6 +322,74 @@ istream& operator >>(istream& in, big_number& n)
 big_number operator+(const big_number& a, const big_number& b)
 {
 	big_number answer;
+	if (a.positive == b.positive)
+	{
+		if ((a.positive && b.positive))
+		{
+			if (a >= b)
+				answer = a;
+			else
+				answer = b;
+		}
+		else if (!(a.positive || b.positive))
+		{
+			if (a <= b)
+				answer = a;
+			else
+				answer = b;
+		}
+		if (answer == a)
+			answer.sum(b);
+		else
+			answer.sum(a);
+	}	
+	else
+	{
+		if (a.digits > b.digits)
+		{
+			answer = a;
+		}
+		else if (a.digits < b.digits)
+		{
+			answer = b;
+		}
+		else //If the two numbers are the same number of digits.
+		{
+			node* cursor1 = a.head_ptr;
+			node* cursor2 = b.head_ptr;
+			for (unsigned int i = 0; i < a.digits; i++)
+			{
+				if (cursor1->data > cursor2->data)
+				{
+					answer = a;
+					break;
+				}
+				else if (cursor1->data < cursor2->data)
+				{
+					answer = b;
+					break;
+				}
+				cursor1 = cursor1->next;
+				cursor2 = cursor2->next;
+			}
+			if (cursor1 == nullptr)
+			{
+				answer = a;
+			}
+		}
+		if (answer == a)
+		{
+			answer.diff(b);
+		}
+		else
+		{			
+			answer.diff(a);
+		}
+	}
+	while (answer.head_ptr->data == '0' && answer.head_ptr != answer.tail_ptr)
+	{
+		remove_node(answer.head_ptr, answer.tail_ptr, '0');
+	}
 	return answer;
 }
 
@@ -421,7 +493,7 @@ big_number& big_number::sum(const big_number& m)
     }
     return *this;
 }
-/*big_number& big_number::diff(const big_number& m)
+big_number& big_number::diff(const big_number& m)
 {
     node* cursor = tail_ptr;
     const node* mcursor = m.tail_ptr;
@@ -451,10 +523,11 @@ big_number& big_number::sum(const big_number& m)
         }
         unsigned int result = dig1 + borrow - dig2;
         cursor->data = alpha[result];
+        cursor = cursor->prev;
+        mcursor = mcursor->prev;
     }
     while (cursor != nullptr)
     {
-        unsigned int dig1 = alpha.find(cursor->data);
         if (borrow > 0)
         {
             if (cursor->data == '0')
@@ -467,6 +540,29 @@ big_number& big_number::sum(const big_number& m)
                 borrow = 0;
             }
         }
+        cursor = cursor->prev;
     }
+    this->updateDigits();
+    cout << endl << *this << "  " << digits << endl;
    return *this;
-}*/
+}
+
+big_number& big_number::updateDigits()
+{
+	unsigned int dig = 0;
+	node* cursor = head_ptr;
+	while (head_ptr->data == '0' && head_ptr != tail_ptr)
+	{
+		remove_node(head_ptr, tail_ptr, '0');
+	}
+	while (cursor != nullptr)
+	{
+		++dig;
+		cursor = cursor->next;
+	}
+	digits = dig;
+	if (digits == 1 && head_ptr->data == '0')
+		positive = true;
+	return *this;
+}
+

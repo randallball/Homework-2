@@ -16,7 +16,7 @@ int main()
 		cout << "Type 'b' to test big integer constructor" << endl;
 		cout << "Type 's' to test string constructor" << endl;
 		cout << "Type 'a' to test assignment" << endl;
-		cout << "Type '+' to test self assigning addition" << endl;
+		cout << "Type '+' to test addition" << endl;
 		cout << "Type '*' to test self assigning multiplication" << endl;
 		cout << "Type '>' to test input operator" << endl;
 		cout << "Type '=' to test comparison operators" << endl;
@@ -77,7 +77,7 @@ int main()
 			cin >> n2;
 			big_number b(n2);
 			cout << "Adding " << a << " with " << b;
-			a += b;
+			a = a + b;
 			cout << " = " << a << endl;
 		}
 
