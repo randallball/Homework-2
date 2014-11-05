@@ -386,10 +386,6 @@ big_number operator+(const big_number& a, const big_number& b)
 			answer.diff(a);
 		}
 	}
-	while (answer.head_ptr->data == '0' && answer.head_ptr != answer.tail_ptr)
-	{
-		remove_node(answer.head_ptr, answer.tail_ptr, '0');
-	}
 	return answer;
 }
 
@@ -491,6 +487,7 @@ big_number& big_number::sum(const big_number& m)
         head_ptr = head_ptr->prev;
         ++digits;
     }
+    this->updateDigits();
     return *this;
 }
 big_number& big_number::diff(const big_number& m)
@@ -543,7 +540,6 @@ big_number& big_number::diff(const big_number& m)
         cursor = cursor->prev;
     }
     this->updateDigits();
-    cout << endl << *this << "  " << digits << endl;
    return *this;
 }
 
@@ -553,11 +549,14 @@ big_number& big_number::updateDigits()
 	node* cursor = head_ptr;
 	while (head_ptr->data == '0' && head_ptr != tail_ptr)
 	{
-		remove_node(head_ptr, tail_ptr, '0');
+		head_ptr = head_ptr->next;
+		head_ptr->prev = nullptr;
+		delete cursor;
+		cursor = head_ptr;
 	}
 	while (cursor != nullptr)
 	{
-		++dig;
+		dig++;
 		cursor = cursor->next;
 	}
 	digits = dig;
