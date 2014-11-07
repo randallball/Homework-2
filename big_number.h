@@ -9,6 +9,7 @@ class big_number
 		// constructors (work like init() methods)
 		big_number();//done
 		big_number(int i);//done
+		big_number(const big_number& m, unsigned int b);//done
 		big_number(const big_number& m);//done
 		big_number(const string& s, unsigned int base);//done
 		
@@ -38,13 +39,13 @@ class big_number
 		friend std::istream& operator>>(std::istream& is, big_number& bignum);//done
 		
 		// arithmetic operators
-		friend big_number operator+(const big_number& a, const big_number& b);
-		friend big_number operator-(const big_number& a, const big_number& b);
-		friend big_number operator*(const big_number& a, const big_number& b);
+		friend big_number operator+(const big_number& a, const big_number& b);//done
+		friend big_number operator-(const big_number& a, const big_number& b);//done
+		friend big_number operator*(const big_number& a, const big_number& b);//done (for same base)
 		friend big_number operator/(const big_number& a, const big_number& b);
 		friend big_number operator%(const big_number& a, const big_number& b);
 		// hard to do without fast multiplication
-		friend big_number factorial(const big_number& a);
+		friend big_number factorial(const big_number& a);//done
 
 		// comparison operators
 		friend bool operator>(const big_number& a, const big_number& b);

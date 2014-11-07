@@ -15,6 +15,7 @@ int main()
 		cout << "Type 'i' to test int constructor" << endl;
 		cout << "Type 'b' to test big integer constructor" << endl;
 		cout << "Type 's' to test string constructor" << endl;
+		cout << "Type 'c' to test conversion constructor" << endl;
 		cout << "Type 'a' to test assignment" << endl;
 		cout << "Type '+' to test addition" << endl;
 		cout << "Type '-' to test subtraction" << endl;
@@ -23,6 +24,7 @@ int main()
 		cout << "Type '*' to test self assigning multiplication" << endl;
 		cout << "Type '>' to test input operator" << endl;
 		cout << "Type '=' to test comparison operators" << endl;
+		cout << "Type '!' to test factorial" << endl;
 		cout << "Type 'q' to quit" << endl;
 		cin >> choice;
 	
@@ -47,6 +49,14 @@ int main()
 			big_number a(s,10);
 			big_number b(a);
 			cout << "Big number constructor with " << s << " gives " << b << endl;
+		}
+
+		if (toupper(choice) == 'C')
+		{
+			big_number e("256", 10);
+			big_number d(e, 16);
+			cout << "Conversion constructor with " << e << " in base " << 
+				10 << " gives " << d << " in base " << 16 << endl;
 		}
 		
 		if (toupper(choice) == 'S')
@@ -74,11 +84,15 @@ int main()
 		if (choice == '+')
 		{
 			cout << "Enter a number: ";
-			cin >> n1;
-			big_number a(n1);
+			cin >> s;
+			//cout << "Enter a base: ";
+			//cin >> n1;
+			big_number a(s, 10);
 			cout << "Enter another number: ";
-			cin >> n2;
-			big_number b(n2);
+			cin >> s;
+			//cout << "Enter a base: ";
+			//cin >> n2;
+			big_number b(s, 10);
 			cout << "Adding " << a << " with " << b;
 			a = a + b;
 			cout << " = " << a << endl;
@@ -132,7 +146,7 @@ int main()
 			cout << "Enter another number: ";
 			cin >> b;
 			cout << "Multiplying " << a << " by " << b << endl;
-			a *= b;
+			a = a * b;
 			cout << " = " << a << endl;
 		}
 		
@@ -164,6 +178,14 @@ int main()
 				cout << f << " > " << g << endl;
 			if (f >= g)
 				cout << f << " >= " << g << endl;
+		}
+
+		if (choice == '!')
+		{
+			big_number n1;
+			cout << "Enter a number: ";
+			cin >> n1;
+			cout << n1 << "! = " << factorial(n1) << endl;
 		}
 
 	} while (toupper(choice) != 'Q'); 

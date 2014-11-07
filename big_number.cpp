@@ -41,7 +41,6 @@ big_number::big_number(int i)
 		}
 		base = 10;
 		string rem;
-		//cout << digits << endl;
 		while (i > 0) //walking backwards along the list, adding the last digit of i.
 		{
 			rem = to_string(i%10);
@@ -51,8 +50,52 @@ big_number::big_number(int i)
 			digits++;
 		}
 
-	}
+	}	
+}
 
+// conversion constructor; convert m to a different base
+big_number::big_number(const big_number& m, unsigned int b)
+{
+	head_ptr = tail_ptr = nullptr;
+	positive = m.positive;
+	
+	big_number zero;
+	zero.base = b;
+	*this = zero;
+	unsigned int digit;
+	
+	big_number* values = new big_number[m.base + 1];
+	
+	big_number j = 0;
+	j.base = b;
+	
+	for (unsigned int i = 0; i <= m.base; ++i)
+	{
+		values[i] = j;
+		++j;
+	}
+	
+	for (const node* cursor = m.head_ptr; cursor != nullptr;
+		cursor = cursor->next)
+	{
+		if (isdigit(cursor->data))
+			digit = cursor->data - '0';
+		else
+			digit = cursor->data - 'a' + 10;
+		big_number intermed = values[m.base] * (*this);
+		if (intermed > zero)
+		{
+			intermed.sum(values[digit]);
+		}
+		else 
+		{
+			big_number temp(intermed);
+			intermed = values[digit];
+			intermed += temp;
+		}
+		*this = intermed;
+	}	
+	delete [] values;
 }
 
 // copy constructor, creates a deep copy of m
@@ -135,34 +178,7 @@ big_number& big_number::operator+= (const big_number& b)
 // set value to original value * b; return answer in original number's base
 big_number& big_number::operator*= (const big_number& b)
 {
-	big_number c;
-	node* cursor1 = b.tail_ptr;
-	node* cursor2;
-	int zeros;
-	int z=0;
-	int prod;
-	string str;
-	while (cursor1 != nullptr)
-	{
-		zeros = z;
-		cursor2 = tail_ptr;//Pointer
-		while (cursor2 != nullptr)
-		{
-			prod = ((int)cursor1->data - 48) * ((int)cursor2->data - 48);//Pointer/Ascii math
-			str = to_string(prod);
-			for (int i = 0; i < zeros; i++)
-			{
-				str.append("0");
-			}
-			big_number d(str, this->base);
-			c += d;
-			cursor2 = cursor2->prev;//walk list backwards.
-			++zeros;
-		}
-		cursor1 = cursor1->prev;
-		++z;
-	}
-	*this = c;
+	*this = *this * b;
 	return *this;
 }
 
@@ -297,19 +313,40 @@ ostream& operator <<(ostream& out, const big_number& n)
 istream& operator >>(istream& in, big_number& n)
 {
 	clear_list(n.head_ptr, n.tail_ptr);
+	n.digits = 0;
 	string str;
 	cin >> str;
+	if (str[0] == '-')
+	{
+		n.positive = false;
+		str.erase(0,1);
+	}
+	else if (str[0] == '+')
+	{
+		n.positive = true;
+		str.erase(0,1);
+	}
+	while (str[0] == '0' && str.length() > 1)
+	{
+		str.erase(0,1);
+	}
 	while (str.length() > 0)//set last char in s to node in list. Walk list backwards.
 	{
 		add_node(n.head_ptr, n.tail_ptr, 0);
 		n.head_ptr->data = str[str.length()-1];
 		str.erase(str.length()-1);
+		++n.digits;
 	}
 	return in;
 }
 
 big_number operator+(const big_number& a, const big_number& b)
 {
+	if (a.base != b.base)
+	{
+		big_number convert(b, a.base);
+		return (a + convert);
+	}
 	big_number answer;
 	if (a.positive == b.positive)
 	{
@@ -328,9 +365,13 @@ big_number operator+(const big_number& a, const big_number& b)
 				answer = b;
 		}
 		if (answer == a)
+		{
 			answer.sum(b);
+		}
 		else
+		{
 			answer.sum(a);
+		}
 	}	
 	else
 	{
@@ -365,15 +406,12 @@ big_number operator+(const big_number& a, const big_number& b)
 			{
 				answer = a;
 			}
+			
 		}
 		if (answer == a)
-		{
 			answer.diff(b);
-		}
-		else
-		{			
+		else			
 			answer.diff(a);
-		}
 	}
 	return answer;
 }
@@ -414,7 +452,41 @@ big_number operator-(const big_number& a, const big_number& b)
 
 big_number operator*(const big_number& a, const big_number& b)
 {
+	big_number add(b);
+	if (a.base != b.base)
+	{
+		big_number convert(b, a.base);
+		add = convert;
+	}
+	node* cursora = a.tail_ptr;
 	big_number answer;
+	answer.base = a.base;
+	big_number sum;
+	big_number zero;
+	unsigned int zeros = 0;
+	while (cursora != nullptr)
+	{
+		sum = zero;
+		int plus = a.alpha.find(cursora->data);
+		for (int i = 0; i < plus; ++i)
+		{
+			sum += add;
+		}
+		for (int j = 0; j < zeros; ++j)
+		{
+			node* addnode = new node;
+			addnode->data = '0';
+			addnode->prev = sum.tail_ptr;
+			addnode->next = nullptr;
+			sum.tail_ptr->next = addnode;
+			sum.tail_ptr = addnode;
+		}
+		answer += sum;
+		cursora = cursora->prev;
+		++zeros;
+	}
+	answer.positive = (a.positive == b.positive);
+	answer.updateDigits();
 	return answer;
 }
 
@@ -432,7 +504,15 @@ big_number operator%(const big_number& a, const big_number& b)
 
 big_number factorial(const big_number& a)
 {
-	big_number answer;
+	big_number answer(1);
+	big_number zero;
+	if (a > zero)
+	{
+		for (int i = 1; i <= a; ++i)
+		{
+			answer *= i;
+		}
+	}
 	return answer;
 }
 
