@@ -468,7 +468,7 @@ big_number operator*(const big_number& a, const big_number& b)
 		{
 			sum += add;
 		}
-		for (int j = 0; j < zeros; ++j)
+		for (unsigned int j = 0; j < zeros; ++j)
 		{
 			node* addnode = new node;
 			addnode->data = '0';
