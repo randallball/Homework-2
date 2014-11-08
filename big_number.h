@@ -18,21 +18,21 @@ class big_number
 		big_number& operator=(const big_number& m);//done
 		
 		// destructor (works like destr() method)
-		~big_number();
+		~big_number();//done
 	
 		// self-assigning arithmetic operators
-		big_number& operator+=(const big_number& addend);//Fix for negative numbers
-		big_number& operator-=(const big_number& subtractand);
-		big_number& operator*=(const big_number& multiplicand);//Seg fault
+		big_number& operator+=(const big_number& addend);//done
+		big_number& operator-=(const big_number& subtractand);//done
+		big_number& operator*=(const big_number& multiplicand);//done
 		big_number& operator/=(const big_number& divisor);
 	
 		// positive modulus
 		big_number& operator%=(const big_number& divisor);
 		
 		// overload prefix increment
-		big_number& operator++();  
+		big_number& operator++();//done
 		// overload prefix decrement
-		big_number& operator--();  
+		big_number& operator--();//done
 		
 		// input and output operators
 		friend std::ostream& operator<<(std::ostream& os, const big_number& bignum);//done
@@ -41,19 +41,19 @@ class big_number
 		// arithmetic operators
 		friend big_number operator+(const big_number& a, const big_number& b);//done
 		friend big_number operator-(const big_number& a, const big_number& b);//done
-		friend big_number operator*(const big_number& a, const big_number& b);//done (for same base)
-		friend big_number operator/(const big_number& a, const big_number& b);
-		friend big_number operator%(const big_number& a, const big_number& b);
+		friend big_number operator*(const big_number& a, const big_number& b);//done
+		friend big_number operator/(const big_number& a, const big_number& b);//done
+		friend big_number operator%(const big_number& a, const big_number& b);//done
 		// hard to do without fast multiplication
 		friend big_number factorial(const big_number& a);//done
 
 		// comparison operators
-		friend bool operator>(const big_number& a, const big_number& b);
-		friend bool operator>=(const big_number& a, const big_number& b);
-		friend bool operator<(const big_number& a, const big_number& b);
-		friend bool operator<=(const big_number& a, const big_number& b);	
-		friend bool operator==(const big_number& a, const big_number& b);
-		friend bool operator!=(const big_number& a, const big_number& b);
+		friend bool operator>(const big_number& a, const big_number& b);//done
+		friend bool operator>=(const big_number& a, const big_number& b);//done
+		friend bool operator<(const big_number& a, const big_number& b);//done
+		friend bool operator<=(const big_number& a, const big_number& b);//done	
+		friend bool operator==(const big_number& a, const big_number& b);//done
+		friend bool operator!=(const big_number& a, const big_number& b);//done
 
 	private:
 	
@@ -65,8 +65,8 @@ class big_number
         string alpha = "0123456789abcdefghijklmnopqrstuvwxyz";
 		
 		// helper functions can go here
-        big_number& sum(const big_number& m);
-        big_number& diff(const big_number& m);
-        big_number& updateDigits();
+        big_number& sum(const big_number& m);//done
+        big_number& diff(const big_number& m);//done
+        big_number& updateDigits();//done
 
 };

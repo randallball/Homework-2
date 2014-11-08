@@ -57,44 +57,34 @@ big_number::big_number(int i)
 big_number::big_number(const big_number& m, unsigned int b)
 {
 	head_ptr = tail_ptr = nullptr;
-	positive = m.positive;
-	
+
 	big_number zero;
 	zero.base = b;
 	*this = zero;
+
 	unsigned int digit;
 	
 	big_number* values = new big_number[m.base + 1];
 	
 	big_number j = 0;
 	j.base = b;
-	
+
 	for (unsigned int i = 0; i <= m.base; ++i)
 	{
 		values[i] = j;
 		++j;
 	}
-	
 	for (const node* cursor = m.head_ptr; cursor != nullptr;
 		cursor = cursor->next)
 	{
-		if (isdigit(cursor->data))
-			digit = cursor->data - '0';
-		else
-			digit = cursor->data - 'a' + 10;
-		big_number intermed = values[m.base] * (*this);
-		if (intermed > zero)
-		{
-			intermed.sum(values[digit]);
-		}
-		else 
-		{
-			big_number temp(intermed);
-			intermed = values[digit];
-			intermed += temp;
-		}
-		*this = intermed;
+		digit = alpha.find(cursor->data);
+
+		*this *= values[m.base];
+		
+		*this += values[digit];
 	}	
+	positive = m.positive;
+
 	delete [] values;
 }
 
@@ -192,6 +182,7 @@ big_number& big_number::operator-= (const big_number& b)
 // set value to original value / b; return answer in original number's base
 big_number& big_number::operator/= (const big_number& b)
 {
+	*this = *this / b;
 	return *this;
 }
 
@@ -204,13 +195,15 @@ big_number& big_number::operator%= (const big_number& b)
 // prefix increment
 big_number& big_number::operator++()
 {
-	return *this;
+	big_number one("1", base);
+	return (*this += one);
 }
 
 // prefix decrement
 big_number& big_number::operator--()
 {
-	return *this;
+	big_number one("1", base);
+	return (*this -= one);
 }
 
 bool operator >(const big_number& a, const big_number& b)
@@ -292,7 +285,7 @@ bool operator==(const big_number& a, const big_number& b)
 	
 bool operator!=(const big_number& a, const big_number& b)
 {
-	return false;
+	return !(a == b);
 }
 
 ostream& operator <<(ostream& out, const big_number& n)
@@ -337,6 +330,7 @@ istream& operator >>(istream& in, big_number& n)
 		str.erase(str.length()-1);
 		++n.digits;
 	}
+	n.updateDigits();
 	return in;
 }
 
@@ -419,7 +413,7 @@ big_number operator+(const big_number& a, const big_number& b)
 big_number operator-(const big_number& a, const big_number& b)
 {
 	big_number answer;
-	big_number z(b);
+	big_number z(b, a.base);
 
 	if (a.positive == b.positive)
 	{
@@ -458,12 +452,14 @@ big_number operator*(const big_number& a, const big_number& b)
 		big_number convert(b, a.base);
 		add = convert;
 	}
-	node* cursora = a.tail_ptr;
+	node* cursora = a.head_ptr;
 	big_number answer;
 	answer.base = a.base;
 	big_number sum;
+	sum.base = a.base;
 	big_number zero;
-	unsigned int zeros = 0;
+	zero.base = a.base;
+	unsigned int zeros = a.digits-1;
 	while (cursora != nullptr)
 	{
 		sum = zero;
@@ -482,8 +478,8 @@ big_number operator*(const big_number& a, const big_number& b)
 			sum.tail_ptr = addnode;
 		}
 		answer += sum;
-		cursora = cursora->prev;
-		++zeros;
+		cursora = cursora->next;
+		--zeros;
 	}
 	answer.positive = (a.positive == b.positive);
 	answer.updateDigits();
@@ -492,26 +488,112 @@ big_number operator*(const big_number& a, const big_number& b)
 
 big_number operator/(const big_number& a, const big_number& b)
 {
-	big_number answer;
+	big_number zero;
+	if (b == zero)
+	{
+		big_number infinity("infinity (Can't divide by zero)", 0);
+		return infinity;
+	}
+	if (a.base != b.base)
+	{
+		big_number convert(b, a.base);
+		return a / convert;
+	}
+
+	big_number answer("0", a.base);
+	big_number c(a);
+	big_number d(b);
+	c.positive = true;
+	d.positive = true;
+	if (c < d)
+	{
+		return answer;
+	}
+	big_number t(10);
+	big_number ten(t, c.base);
+	big_number dig(c.digits - d.digits);
+	big_number one("1", c.base);
+	big_number add;
+	answer = one;
+	for (int i = 0; i < dig; ++i)
+	{
+		answer *= ten;
+	}
+	add = answer / ten;
+	if (answer < 10)
+		++add;
+	bool plus = true;
+	while (add >= one)
+	{
+		if (add == one)
+			plus = true;
+		if (plus)
+		{
+			while ((answer * d) < c)
+			{
+				answer += add;
+			}
+			plus = false;
+		}
+		else
+		{
+			while ((answer * d) > c)
+			{
+				answer -= add;
+			}
+			plus = true;
+		}
+		add /= ten;
+	}
+	while ((answer * d) > c)
+	{
+		answer -= one;
+	}
+	/*while ((d * answer) < c)
+	{
+		answer += add;
+	}
+	while ((d * answer) > c)
+	{
+		answer -= one;
+	}*/
+	answer.positive = (a.positive == b.positive);
+	answer.updateDigits();
 	return answer;
 }
 
 big_number operator%(const big_number& a, const big_number& b)
 {
-	big_number answer;
+	big_number divisor = (a / b);
+	divisor *= b;
+	big_number answer = (a - divisor);
 	return answer;
 }
 
 big_number factorial(const big_number& a)
 {
-	big_number answer(1);
+	big_number answer;
 	big_number zero;
+	big_number b(a);
+	big_number mult(1);
 	if (a > zero)
 	{
-		for (int i = 1; i <= a; ++i)
+		big_number two(2);
+		if (a%two != zero)
 		{
-			answer *= i;
+			mult = a;
+			--b;
 		}
+		answer = b;
+		big_number high(b);
+		big_number low(b-two);
+		while (low >= two)
+		{
+			answer *= (high + low);
+			high += low;
+			low -= two;
+		}
+		answer *= mult;
 	}
 	return answer;
 }
@@ -530,20 +612,12 @@ big_number& big_number::sum(const big_number& m)
         unsigned int result = dig1 + dig2 + carry;
         if (result >= base)
         {
-            if (base <= 10) 
-                cursor->data = ((result % base)) + '0';
-            else
-                cursor->data = result + 'a' + 10; 
+            cursor->data = alpha[result % base]; 
             carry = 1;
         }
         else
         {
-            if (base <= 10)
-            {
-                cursor->data = result + '0';
-            }
-            else
-                cursor->data = result + 'a' - 10;
+            cursor->data = alpha[result];
             carry = 0;
         }
         cursor = cursor->prev;
@@ -556,20 +630,12 @@ big_number& big_number::sum(const big_number& m)
         unsigned int result = dig1 + carry;
         if (result >= base)
         {
-            if (base <= 10)
-                cursor->data = ((result % base)) + '0';
-            else
-                cursor->data = result + 'a' + 10; 
+            cursor->data = alpha[result%base]; 
             carry = 1;
         }
         else
         {
-            if (base <= 10)
-            {
-                cursor->data = result + '0';
-            }
-            else
-                cursor->data = result + 'a' - 10;
+            cursor->data = alpha[result];
             carry = 0;
         }
         cursor = cursor->prev;
@@ -610,12 +676,16 @@ big_number& big_number::diff(const big_number& m)
 
         unsigned int dig1 = alpha.find(cursor->data);
         unsigned int dig2 = alpha.find(mcursor->data);
-
+        unsigned int result;
         if (dig2 > dig1 && cursor->prev != nullptr)
         { 
-            borrow = base;         
+            borrow = base; 
+       	 	result = dig1 + borrow - dig2;
         }
-        unsigned int result = dig1 + borrow - dig2;
+        else
+        {
+        	result = dig1 - dig2;
+        }
         cursor->data = alpha[result];
         cursor = cursor->prev;
         mcursor = mcursor->prev;
@@ -644,6 +714,7 @@ big_number& big_number::updateDigits()
 {
 	unsigned int dig = 0;
 	node* cursor = head_ptr;
+	big_number zero;
 	while (head_ptr->data == '0' && head_ptr != tail_ptr)
 	{
 		head_ptr = head_ptr->next;

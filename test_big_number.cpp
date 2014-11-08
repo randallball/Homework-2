@@ -25,6 +25,8 @@ int main()
 		cout << "Type '>' to test input operator" << endl;
 		cout << "Type '=' to test comparison operators" << endl;
 		cout << "Type '!' to test factorial" << endl;
+		cout << "Type '/' to test division" << endl;
+		cout << "Type 'm' to test mod" << endl;
 		cout << "Type 'q' to quit" << endl;
 		cin >> choice;
 	
@@ -53,7 +55,7 @@ int main()
 
 		if (toupper(choice) == 'C')
 		{
-			big_number e("256", 10);
+			big_number e("-256", 10);
 			big_number d(e, 16);
 			cout << "Conversion constructor with " << e << " in base " << 
 				10 << " gives " << d << " in base " << 16 << endl;
@@ -76,8 +78,8 @@ int main()
 			big_number d;
 			d = e;
 			cout << "Assignment of " << e << " to ";
-			++e;
 			cout << d << " gives " << e << endl;
+			++e;
 			if (d == e) cout << "boo, shallow copy";
 		}
 
@@ -101,11 +103,11 @@ int main()
 		if (choice == '-')
 		{
 			cout << "Enter a number: ";
-			cin >> n1;
-			big_number a(n1);
+			cin >> s;
+			big_number a(s, 10);
 			cout << "Enter another number: ";
-			cin >> n2;
-			big_number b(n2);
+			cin >> s;
+			big_number b(s, 10);
 			cout << a << " - " << b;
 			a = a - b;
 			cout << " = " << a << endl;
@@ -120,18 +122,21 @@ int main()
 			cin >> n2;
 			big_number b(n2);
 			cout << a << " + " << b;
-			a += b;
+			for (int i = 0; i < 10; i++)
+			{
+				a+=b;
+			}
 			cout << " = " << a << endl;
 		}
 
 		if (choice == '2')
 		{
 			cout << "Enter a number: ";
-			cin >> n1;
-			big_number a(n1);
+			cin >> s;
+			big_number a(s, 16);
 			cout << "Enter another number: ";
-			cin >> n2;
-			big_number b(n2);
+			cin >> s;
+			big_number b(s, 2);
 			cout << a << " - " << b;
 			a -= b;
 			cout << " = " << a << endl;
@@ -139,17 +144,43 @@ int main()
 
 		if (choice == '*')
 		{
-			big_number a;
-			big_number b;
 			cout << "Enter a number: ";
-			cin >> a;
+			cin >> s;
+			big_number a(s, 10);
 			cout << "Enter another number: ";
-			cin >> b;
+			cin >> s;
+			big_number b(s, 10);
 			cout << "Multiplying " << a << " by " << b << endl;
-			a = a * b;
-			cout << " = " << a << endl;
+			a *= b;
+			cout << a << endl;
 		}
 		
+		if (choice == '/')
+		{
+			cout << "Enter a number: ";
+			cin >> s;
+			big_number a(s, 10);
+			cout << "Enter another number: ";
+			cin >> s;
+			big_number b(s, 10);
+			cout << a << " / " << b << " = ";
+			big_number answer;
+			answer = a/b;
+			cout << answer << endl;
+		}
+
+		if (choice == 'm')
+		{
+			cout << "Enter a number: ";
+			cin >> s;
+			big_number a(s, 10);
+			cout << "Enter another number: ";
+			cin >> s;
+			big_number b(s, 10);
+			cout << a << " % " << b;
+			cout << " = " << (a % b) << endl;
+		}
+
 		if (choice == '>')
 		{
 			big_number n1;
